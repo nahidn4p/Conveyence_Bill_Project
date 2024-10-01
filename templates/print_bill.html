@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Conveyance Bill</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 24px;
+        }
+        .logo {
+            max-width: 100px; /* Adjust as needed */
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .total {
+            font-weight: bold;
+        }
+        .total-in-words {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 70px; /* Space above signature lines */
+        }
+        .signature-container {
+            width: 15%; /* Width for each signature line */
+            text-align: center; /* Center text below each signature */
+        }
+        .signature-line {
+            border-top: 1px solid black;
+            height: 20px; /* Adjust height if needed */
+            margin-bottom: 5px; /* Space between line and label */
+        }
+        .signature-text {
+            margin-top: 5px; /* Space between line and text */
+            line-height: 1.5; /* Improve vertical alignment */
+        }
+    </style>
+</head>
+<body>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+    
+    <h1>Conveyance Bill for {{ month_year }}</h1>
+
+    <p><strong>Name:</strong> {{ name }}</p>
+    <p><strong>Designation:</strong> {{ designation }}</p>
+    <p><strong>ID Card:</strong> {{ id_card }}</p>
+    <p><strong>Department:</strong> {{ department }}</p>
+    <p><strong>Bill Date:</strong> {{ bill_date }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Days</th>
+                <th>Way</th>
+                <th>Rate (Tk)</th>
+                <th>Amount (Tk)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for trip in trips %}
+            <tr>
+                <td>{{ trip.date }}</td>
+                <td>{{ trip.from }}</td>
+                <td>{{ trip.to }}</td>
+                <td>{{ trip.days }}</td>
+                <td>{{ trip.way }}</td>
+                <td>{{ trip.rate }}</td>
+                <td>{{ trip.amount }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p class="total">Total: {{ total }} Tk (In Words: {{ total_in_words }} Taka Only)</p>
+    
+    <div class="signature-section">
+        <div class="signature-container">
+            <div class="signature-line"></div>
+            <p class="signature-text">Prepared By</p>
+        </div>
+        <div class="signature-container">
+            <div class="signature-line"></div>
+            <p class="signature-text">HR & Admin</p>
+        </div>
+        <div class="signature-container">
+            <div class="signature-line"></div>
+            <p class="signature-text">Approved By</p>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
