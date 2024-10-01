@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for
 from datetime import datetime
+
 def number_to_words(n):
     """Convert a number into words."""
-    # Handle numbers from 0 to 9999
     units = (
         "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
         "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
@@ -57,6 +57,13 @@ def index():
         total = int(rate) * total_days
         bill_date = datetime.now().strftime('%Y-%m-%d')
 
+        # Determine month and year from the first trip date
+        if trips:  # Check if trips is not empty
+            first_trip_date = datetime.strptime(trips[0]['date'], '%Y-%m-%d')
+            month_year = first_trip_date.strftime('%B %Y')  # Format to "October 2024"
+        else:
+            month_year = datetime.now().strftime('%B %Y')  # Fallback to current month if no trips
+
         # Redirect to the print_bill route
         return redirect(url_for('print_bill',
                                 name=name,
@@ -66,7 +73,8 @@ def index():
                                 bill_date=bill_date,
                                 trips=trips,
                                 total=total,
-                                remarks=overall_remarks))
+                                remarks=overall_remarks,
+                                month_year=month_year))  # Pass the new month_year
 
     return render_template('index.html')
 
@@ -84,7 +92,8 @@ def print_bill():
     except ValueError:
         return "Invalid date format", 400  # Handle invalid date format
 
-    month_year = bill_date.strftime('%B %Y')  # e.g., "October 2024"
+    # Get the month and year passed from the redirect
+    month_year = request.args.get('month_year')
     
     total = request.args.get('total')
     trips = request.args.getlist('trips')
