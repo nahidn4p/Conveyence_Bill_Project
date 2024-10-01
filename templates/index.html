@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conveyance Bill</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .total {
+            font-weight: bold;
+        }
+        .logo {
+            max-width: 200px; /* Adjust as needed */
+            margin-bottom: 20px;
+        }
+        .form-container {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+
+    <div class="form-container">
+        <h2>Input Details</h2>
+        <form action="/" method="POST">
+            <label for="name">Name:</label><br>
+            <input type="text" id="name" name="name" required><br><br>
+
+            <label for="designation">Designation:</label><br>
+            <input type="text" id="designation" name="designation" required><br><br>
+
+            <label for="id_card">ID Card:</label><br>
+            <input type="text" id="id_card" name="id_card" required><br><br>
+
+            <label for="department">Department:</label><br>
+            <input type="text" id="department" name="department" required><br><br>
+
+            <label for="to">To:</label><br>
+            <input type="text" id="to" name="to" required><br><br>
+
+            <label for="rate">Rate (Tk):</label><br>
+            <input type="number" id="rate" name="rate" required><br><br>
+
+            <label for="total_days">Total Days:</label>
+            <input type="number" id="total_days" name="total_days" required>
+
+            <div id="trip_dates">
+                <h3>Trip Dates</h3>
+                <div id="trip_date_inputs"></div>
+            </div>
+
+            <label for="remarks">Remarks:</label>
+            <input type="text" id="remarks" name="remarks" placeholder="Enter any remarks here...">
+
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+    <script>
+        // Dynamically create input fields for trip dates
+        document.getElementById('total_days').addEventListener('input', function() {
+            const totalDays = this.value;
+            const container = document.getElementById('trip_date_inputs');
+            container.innerHTML = ''; // Clear existing inputs
+            for (let i = 0; i < totalDays; i++) {
+                container.innerHTML += `
+                    <label for="trip_date_${i}">Trip Date ${i + 1}:</label>
+                    <input type="date" id="trip_date_${i}" name="trip_date_${i}" required>
+                    <br><br>
+                `;
+            }
+        });
+    </script>
+
+    {% if data %}
+    <h1>Conveyance Bill</h1>
+    <p>Name: {{ data.name }}</p>
+    <p>Designation: {{ data.designation }}</p>
+    <p>ID Card: {{ data.id_card }}</p>
+    <p>Department: {{ data.department }}</p>
+    <p>Bill Date: {{ data.bill_date }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Days</th>
+                <th>Way</th>
+                <th>Rate (Tk)</th>
+                <th>Amount (Tk)</th>
+                <th>Remarks</th> <!-- New column for remarks -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for trip in data.trips %}
+            <tr>
+                <td>{{ trip.date }}</td>
+                <td>{{ trip.from }}</td>
+                <td>{{ trip.to }}</td>
+                <td>{{ trip.days }}</td>
+                <td>{{ trip.way }}</td>
+                <td>{{ trip.rate }}</td>
+                <td>{{ trip.amount }}</td>
+                <td>{{ trip.remarks }}</td> <!-- Display the remarks -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p class="total">Total: {{ data.total }} Tk</p>
+    {% endif %}
+</body>
+</html>
