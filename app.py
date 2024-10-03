@@ -33,6 +33,7 @@ def index():
         designation = request.form['designation']
         id_card = request.form['id_card']
         department = request.form['department']
+        fr = request.form['from']
         to = request.form['to']
         rate = request.form['rate']
         total_days = int(request.form['total_days'])
@@ -40,21 +41,24 @@ def index():
 
         # Collect trips based on dynamic dates
         trips = []
+        total = 0
         for i in range(total_days):
             trip_date = request.form.get(f'trip_date_{i}')
+            way= request.form.get(f'way_{i}')
+            amount=int(rate)*int(way)
             trips.append({
                 "date": trip_date,
-                "from": "NHTE",
+                "from": fr,
                 "to": to,
                 "days": 1,
-                "way": 1,
+                "way": way,
                 "rate": rate,
-                "amount": rate,
-                "remarks": overall_remarks  # Use the single remarks for all trips
+                "amount": amount,
+                "remarks": overall_remarks,  # Use the single remarks for all trips
+                "total_days":total_days
             })
-
-        # Create data dictionary
-        total = int(rate) * total_days
+            total += amount  # Add the current trip's amount to total
+        print(total)
         bill_date = datetime.now().strftime('%Y-%m-%d')
 
         # Determine month and year from the first trip date
@@ -69,12 +73,14 @@ def index():
                                 name=name,
                                 designation=designation,
                                 id_card=id_card,
+            
                                 department=department,
                                 bill_date=bill_date,
                                 trips=trips,
                                 total=total,
                                 remarks=overall_remarks,
-                                month_year=month_year))  # Pass the new month_year
+                                month_year=month_year,
+                                total_days=total_days))  # Pass the new month_year
 
     return render_template('index.html')
 
@@ -85,10 +91,11 @@ def print_bill():
     id_card = request.args.get('id_card')
     department = request.args.get('department')
     bill_date_str = request.args.get('bill_date')
+    total_days = request.args.get('total_days', type=int, default=0) 
 
     # Ensure the date is in 'YYYY-MM-DD' format for parsing
     try:
-        bill_date = datetime.strptime(bill_date_str, '%Y-%m-%d')
+        bill_date = datetime.now().strftime('%d-%m-%Y')
     except ValueError:
         return "Invalid date format", 400  # Handle invalid date format
 
@@ -105,11 +112,11 @@ def print_bill():
     # Convert trips data from string to dictionary
     trips_data = [eval(trip) for trip in trips]  # Be cautious with eval; consider safer alternatives
 
-    return render_template('print_bill.html', name=name, designation=designation, 
+    return render_template('print_bill.html', name=name, designation=designation,
                            id_card=id_card, department=department, 
                            month_year=month_year, trips=trips_data, 
                            total=total, total_in_words=total_in_words,
-                           overall_remarks=overall_remarks)
+                           overall_remarks=overall_remarks,bill_date=bill_date,total_days=total_days)
 
 if __name__ == '__main__':
     app.run(debug=True)
