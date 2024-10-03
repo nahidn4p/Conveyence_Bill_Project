@@ -63,7 +63,12 @@
 <body>
     <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
     
-    <h1>Conveyance Bill for {{ month_year }}</h1>
+    {% if total_days > 1 %}
+        <h1>Conveyance Bill for {{ month_year }}</h1>
+    {% else %}
+        <h1>Conveyance Bill</h1>
+    {% endif %}
+
 
     <p><strong>Name:</strong> {{ name }}</p>
     <p><strong>Designation:</strong> {{ designation }}</p>
@@ -77,7 +82,6 @@
                 <th>Date</th>
                 <th>From</th>
                 <th>To</th>
-                <th>Days</th>
                 <th>Way</th>
                 <th>Rate (Tk)</th>
                 <th>Amount (Tk)</th>
@@ -89,7 +93,6 @@
                 <td>{{ trip.date }}</td>
                 <td>{{ trip.from }}</td>
                 <td>{{ trip.to }}</td>
-                <td>{{ trip.days }}</td>
                 <td>{{ trip.way }}</td>
                 <td>{{ trip.rate }}</td>
                 <td>{{ trip.amount }}</td>
