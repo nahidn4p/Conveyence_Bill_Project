@@ -1,82 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conveyance Bill</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+        :root {
+            --primary: #3498db;
+            --bg-light: #f4faff;
+            --text-dark: #333;
+            --border-color: #ddd;
         }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        }
+
+        h1, h2, h3 {
+            color: var(--primary);
+            text-align: center;
+        }
+
+        img.logo {
+            display: block;
+            margin: 0 auto 20px;
+            max-width: 180px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="time"],
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            box-sizing: border-box;
+            transition: 0.2s ease-in-out;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+
+        input[type="submit"] {
+            background-color: var(--primary);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #2c80b4;
+        }
+
+        fieldset {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 15px;
+            background: #f9f9f9;
+        }
+
+        legend {
+            font-weight: bold;
+            color: var(--primary);
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin-top: 30px;
         }
-        th, td {
+
+        th,
+        td {
+            border: 1px solid var(--border-color);
             padding: 10px;
-            border: 1px solid #ccc;
             text-align: left;
         }
+
         th {
-            background-color: #f2f2f2;
+            background-color: #eaf4fb;
         }
+
         .total {
             font-weight: bold;
+            text-align: right;
+            font-size: 18px;
+            margin-top: 15px;
         }
-        .logo {
-            max-width: 200px; /* Adjust as needed */
-            margin-bottom: 20px;
-        }
-        .form-container {
-            margin-bottom: 20px;
-        }
-        .copyright {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        text-align: center;
-        background-color: #f2f2f2;
-        padding: 10px 0;
-        border-top: 1px solid #ccc;
-        width: 100%; /* Ensure it spans the full width */
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #999;
+            font-size: 14px;
         }
     </style>
 </head>
-<body>
-    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
 
-    <div class="form-container">
+<body>
+    <div class="container">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
+
         <h2>Input Details</h2>
         <form action="/" method="POST">
-            <label for="name">Name:</label><br>
-            <input type="text" id="name" name="name" required><br><br>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
 
-            <label for="designation">Designation:</label><br>
+            <label for="designation">Designation:</label>
             <input type="text" id="designation" name="designation" required>
-            <br><br>
-            <label for="id_card">ID Card:</label><br>
-            <input type="text" id="id_card" name="id_card" required><br><br>
 
-            <label for="department">Department:</label><br>
-            <input type="text" id="department" name="department" required><br><br>
-            
-            <label for="from">From:</label><br>
-            <input type="text" id="from" name="from" required><br><br>
+            <label for="id_card">ID Card:</label>
+            <input type="text" id="id_card" name="id_card" required>
 
-            <label for="to">To:</label><br>
-            <input type="text" id="to" name="to" required><br><br>
+            <label for="department">Department:</label>
+            <input type="text" id="department" name="department" required>
 
-            <label for="rate">Rate (Tk):</label><br>
-            <input type="number" id="rate" name="rate" required><br><br>
+            <label for="from">From:</label>
+            <input type="text" id="from" name="from" required>
+
+            <label for="to">To:</label>
+            <input type="text" id="to" name="to" required>
+
+            <label for="rate">Rate (Tk):</label>
+            <input type="number" id="rate" name="rate" required>
 
             <label for="total_days">Total Days:</label>
             <input type="number" id="total_days" name="total_days" required>
 
             <div id="trip_dates">
-                <h3>Trip Dates</h3>
+                <h3>Vehicle Missing Dates</h3>
                 <div id="trip_date_inputs"></div>
             </div>
 
@@ -85,67 +167,76 @@
 
             <input type="submit" value="Submit">
         </form>
+
+        {% if data %}
+        <h1>Conveyance Bill</h1>
+        <p><strong>Name:</strong> {{ data.name }}</p>
+        <p><strong>Designation:</strong> {{ data.designation }}</p>
+        <p><strong>ID Card:</strong> {{ data.id_card }}</p>
+        <p><strong>Department:</strong> {{ data.department }}</p>
+        <p><strong>Bill Date:</strong> {{ data.bill_date }}</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Days</th>
+                    <th>Way</th>
+                    <th>Rate (Tk)</th>
+                    <th>Amount (Tk)</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trip in data.trips %}
+                <tr>
+                    <td>{{ trip.date }}</td>
+                    <td>{{ trip.from }}</td>
+                    <td>{{ trip.to }}</td>
+                    <td>{{ trip.days }}</td>
+                    <td>{{ trip.way }}</td>
+                    <td>{{ trip.rate }}</td>
+                    <td>{{ trip.amount }}</td>
+                    <td>{{ trip.remarks }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p class="total">Total: {{ data.total }} Tk</p>
+        {% endif %}
     </div>
 
+    <footer>
+        &copy; 2024 Nahid. All rights reserved.
+    </footer>
+
     <script>
-        // Dynamically create input fields for trip dates
-        document.getElementById('total_days').addEventListener('input', function() {
+        // Dynamic trip input generation
+        document.getElementById('total_days').addEventListener('input', function () {
             const totalDays = this.value;
             const container = document.getElementById('trip_date_inputs');
-            container.innerHTML = ''; // Clear existing inputs
+            container.innerHTML = '';
             for (let i = 0; i < totalDays; i++) {
                 container.innerHTML += `
-                    <label for="trip_date_${i}">Trip Date ${i + 1}:</label>
-                    <input type="date" id="trip_date_${i}" name="trip_date_${i}" required>
-                    <label>Way:</label>
-                    <input type="number" id="way_${i}" name="way_${i}" value="1" required>
-                    <br><br>
-                `;
+                    <fieldset>
+                        <legend>Trip ${i + 1}</legend>
+                        <label for="trip_date_${i}">Trip Date:</label>
+                        <input type="date" id="trip_date_${i}" name="trip_date_${i}" required>
+
+                        <label for="in_time_${i}">In Time:</label>
+                        <input type="time" id="in_time_${i}" name="in_time_${i}" required>
+
+                        <label for="out_time_${i}">Out Time:</label>
+                        <input type="time" id="out_time_${i}" name="out_time_${i}" required>
+
+                        <label for="way_${i}">Way:</label>
+                        <input type="number" id="way_${i}" name="way_${i}" value="1" required>
+                    </fieldset>`;
             }
         });
     </script>
-
-    {% if data %}
-    <h1>Conveyance Bill</h1>
-    <p>Name: {{ data.name }}</p>
-    <p>Designation: {{ data.designation }}</p>
-    <p>ID Card: {{ data.id_card }}</p>
-    <p>Department: {{ data.department }}</p>
-    <p>Bill Date: {{ data.bill_date }}</p>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>From</th>
-                <th>To</th>
-                <th>Days</th>
-                <th>Way</th>
-                <th>Rate (Tk)</th>
-                <th>Amount (Tk)</th>
-                <th>Remarks</th> <!-- New column for remarks -->
-            </tr>
-        </thead>
-        <tbody>
-            {% for trip in data.trips %}
-            <tr>
-                <td>{{ trip.date }}</td>
-                <td>{{ trip.from }}</td>
-                <td>{{ trip.to }}</td>
-                <td>{{ trip.days }}</td>
-                <td>{{ trip.way }}</td>
-                <td>{{ trip.rate }}</td>
-                <td>{{ trip.amount }}</td>
-                <td>{{ trip.remarks }}</td> <!-- Display the remarks -->
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <p class="total">Total: {{ data.total }} Tk</p>
-    {% endif %}
-
-    
 </body>
-<footer align="center">&copy; Copyright 2024 Nahid</footer>
 
 </html>
