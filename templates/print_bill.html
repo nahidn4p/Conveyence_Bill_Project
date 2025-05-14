@@ -5,64 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Print Conveyance Bill</title>
     <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        padding: 20px;
+    }
+
+    @media print {
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
+            zoom: 85%; /* Scale down to fit everything on one page */
         }
-        h1 {
-            text-align: center;
-            margin: 10px 0;
-            font-size: 24px;
+
+        .avoid-break {
+            page-break-inside: avoid;
         }
-        .logo {
-            max-width: 100px; /* Adjust as needed */
-            margin-bottom: 20px;
+
+        .no-print {
+            display: none; /* Hide buttons, etc. */
         }
+
         table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
+            page-break-inside: avoid !important;
         }
-        th, td {
-            padding: 10px;
-            border: 1px solid #ccc;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .total {
-            font-weight: bold;
-        }
-        .total-in-words {
-            margin-top: 10px;
-            font-size: 18px;
-            font-weight: bold;
-        }
+
         .signature-section {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 70px; /* Space above signature lines */
+            page-break-inside: avoid;
         }
-        .signature-container {
-            width: 15%; /* Width for each signature line */
-            text-align: center; /* Center text below each signature */
-        }
-        .signature-line {
-            border-top: 1px solid black;
-            height: 20px; /* Adjust height if needed */
-            margin-bottom: 5px; /* Space between line and label */
-        }
-        .signature-text {
-            margin-top: 5px; /* Space between line and text */
-            line-height: 1.5; /* Improve vertical alignment */
-        }
-    </style>
+    }
+
+    h1 {
+        text-align: center;
+        margin: 10px 0;
+        font-size: 24px;
+    }
+
+    .logo {
+        max-width: 100px;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+    }
+
+    th, td {
+        padding: 8px;
+        border: 1px solid #ccc;
+        text-align: left;
+        font-size: 13px;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    .total {
+        font-weight: bold;
+    }
+
+    .signature-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 80px; /* Adds space before signatures */
+    padding-top: 20px;
+}
+
+.signature-container {
+    text-align: center;
+    width: 30%;
+}
+
+.signature-line {
+    border-top: 1px solid #000;
+    margin-bottom: 5px;
+    height: 1px;
+}
+
+.signature-text {
+    margin-top: 5px;
+    font-weight: bold;
+}
+
+    .total-in-words {
+        font-size: 15px;
+        font-weight: bold;
+    }
+</style>
+
 </head>
 <body>
     <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
-    
+    <div style="text-align: right; margin-bottom: 10px;">
+    <button onclick="window.print()" style="
+        background-color: #0ab5e7;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    ">
+        🖨️ Print
+    </button>
+</div>
+
+
     {% if total_days > 1 %}
         <h1>Conveyance Bill for {{ month_year }}</h1>
     {% else %}
@@ -76,15 +128,18 @@
     <p><strong>Department:</strong> {{ department }}</p>
     <p><strong>Bill Date:</strong> {{ bill_date }}</p>
 
-    <table>
+    <table class="avoid-break">
         <thead>
             <tr>
                 <th>Date</th>
                 <th>From</th>
                 <th>To</th>
+                <th>In Time</th>
+                <th>Out Time</th>
                 <th>Way</th>
-                <th>Rate (Tk)</th>
-                <th>Amount (Tk)</th>
+                <th>Rate (Taka)</th>
+                <th>Amount (Taka)</th>
+                <th>Remarks</th>
             </tr>
         </thead>
         <tbody>
@@ -93,17 +148,35 @@
                 <td>{{ trip.date }}</td>
                 <td>{{ trip.from }}</td>
                 <td>{{ trip.to }}</td>
+                <td>{{ trip.in_time }}</td>
+                <td>{{ trip.out_time }}</td>
                 <td>{{ trip.way }}</td>
                 <td>{{ trip.rate }}</td>
                 <td>{{ trip.amount }}</td>
+                <td>{{ trip.remarks }}</td>
             </tr>
             {% endfor %}
+             <!-- Total Row -->
+             <tr>
+
+                <td colspan="7" class="total" style="font-weight: bold; text-align: right;">Total Amount:</td>
+                <td class="total" style="font-weight: bold;">{{ total }} /=</td>
+                <td></td>
+            </tr>
         </tbody>
     </table>
 
-    <p class="total">Total: {{ total }} Tk (In Words: {{ total_in_words }} Taka Only)</p>
-    
-    <div class="signature-section">
+    <table cellspacing="0" cellpadding="5">
+        <tr>
+            <td>
+                <p class="total">In Words: {{ total_in_words }} Taka Only</p>
+            </td>
+        </tr>
+
+    </table>
+    <!--<hr style="margin-top: 60px; margin-bottom: 60px;">-->
+
+    <div class="signature-section avoid-break">
         <div class="signature-container">
             <div class="signature-line"></div>
             <p class="signature-text">Prepared By</p>
@@ -118,10 +191,10 @@
         </div>
     </div>
 
-    <script>
-        window.onload = function() {
-            window.print();
-        }
-    </script>
+    <!--<script>-->
+    <!--    window.onload = function() {-->
+    <!--        window.print();-->
+    <!--    }-->
+    <!--</script>-->
 </body>
 </html>
